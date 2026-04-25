@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Porcelaneczka — Polish porcelain & glassware</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Cooper+Hewitt:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    // Default tweaks — rewritten on disk when user changes tweaks
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "accentColor": "#a86a3d",
+      "serif": "Fraunces",
+      "sans": "Inter Tight",
+      "heroLayout": "full",
+      "viewport": "desktop"
+    }/*EDITMODE-END*/;
+    window.__TWEAK_DEFAULTS = TWEAK_DEFAULTS;
+  </script>
+
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="ui.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+  <script type="text/babel" src="layout.jsx"></script>
+  <script type="text/babel" src="pages.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function ViewportSwitch({ viewport, onChange }) {
+      return (
+        <div className="pc-vswitch" role="group" aria-label="Viewport">
+          <button className={viewport === 'desktop' ? 'is-on' : ''} onClick={() => onChange('desktop')}>
+            <Monitor size={14} /> Desktop
+          </button>
+          <button className={viewport === 'mobile' ? 'is-on' : ''} onClick={() => onChange('mobile')}>
+            <Smartphone size={14} /> Mobile
+          </button>
+        </div>
+      );
+    }
+
+    function App() {
+      const [t, setTweak] = useTweaks(window.__TWEAK_DEFAULTS);
+      const [lang, setLang] = useState('pl');
+      window.__setLang = setLang;
+
+      // Apply tokens
+      useEffect(() => {
+        const root = document.documentElement;
+        root.style.setProperty('--accent', t.accentColor);
+        root.style.setProperty('--serif', `'${t.serif}', Georgia, serif`);
+        root.style.setProperty('--sans', `'${t.sans}', -apple-system, sans-serif`);
+        root.style.setProperty('--accent-soft', `color-mix(in oklab, ${t.accentColor} 14%, #faf9f6)`);
+      }, [t.accentColor, t.serif, t.sans]);
+
+      const compact = t.viewport === 'mobile';
+
+      return (
+        <StoreProvider lang={lang}>
+          <ViewportSwitch viewport={t.viewport} onChange={(v) => setTweak('viewport', v)} />
+          <div className="pc-stage">
+            <div className={`pc-frame ${compact ? 'pc-frame--mobile' : ''}`}>
+              <div className="pc-scroll" data-scroll-root>
+                <Navbar compact={compact} />
+                <Main heroLayout={t.heroLayout} />
+                <Footer compact={compact} />
+              </div>
+              <MobileNavSheet />
+              <CartSheet />
+            </div>
+          </div>
+
+          <TweaksPanel>
+            <TweakSection label="Theme" />
+            <TweakColor
+              label="Accent"
+              value={t.accentColor}
+              onChange={(v) => setTweak('accentColor', v)}
+            />
+            <TweakRadio
+              label="Palette"
+              value={t.accentColor}
+              options={[
+                { value: '#a86a3d', label: 'Brass' },
+                { value: '#b65d49', label: 'Terra' },
+                { value: '#8b6f47', label: 'Wax' },
+                { value: '#7a5230', label: 'Walnut' },
+              ]}
+              onChange={(v) => setTweak('accentColor', v)}
+            />
+            <TweakSelect
+              label="Serif"
+              value={t.serif}
+              options={[
+                { value: 'Fraunces', label: 'Fraunces (warm)' },
+                { value: 'Libre Caslon Text', label: 'Libre Caslon' },
+                { value: 'EB Garamond', label: 'EB Garamond' },
+                { value: 'Playfair Display', label: 'Playfair Display' },
+                { value: 'Cormorant Garamond', label: 'Cormorant' },
+              ]}
+              onChange={(v) => setTweak('serif', v)}
+            />
+            <TweakSelect
+              label="Sans"
+              value={t.sans}
+              options={[
+                { value: 'Inter Tight', label: 'Inter Tight' },
+                { value: 'Inter', label: 'Inter' },
+                { value: 'Manrope', label: 'Manrope' },
+              ]}
+              onChange={(v) => setTweak('sans', v)}
+            />
+
+            <TweakSection label="Hero layout" />
+            <TweakRadio
+              label="Style"
+              value={t.heroLayout}
+              options={[
+                { value: 'full', label: 'Full-bleed' },
+                { value: 'split', label: 'Split' },
+                { value: 'still', label: 'Still life' },
+              ]}
+              onChange={(v) => setTweak('heroLayout', v)}
+            />
+
+            <TweakSection label="Viewport" />
+            <TweakRadio
+              label="Device"
+              value={t.viewport}
+              options={[
+                { value: 'desktop', label: 'Desktop' },
+                { value: 'mobile', label: 'Mobile' },
+              ]}
+              onChange={(v) => setTweak('viewport', v)}
+            />
+          </TweaksPanel>
+        </StoreProvider>
+      );
+    }
+
+    function Main({ heroLayout }) {
+      const s = useStore();
+      if (s.route.page === 'product') {
+        return <ProductPage productId={s.route.id} />;
+      }
+      return <HomePage heroLayout={heroLayout} />;
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
