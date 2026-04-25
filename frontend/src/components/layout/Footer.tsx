@@ -10,7 +10,7 @@ export function Footer() {
         <div className="pc-foot__brand">
           <Logo />
           <p className="pc-foot__tag">{t.tagline}</p>
-          <p className="pc-foot__note">{s.t.fleaStory}</p>
+          {s.t.fleaStory && <p className="pc-foot__note">{s.t.fleaStory}</p>}
         </div>
         <div className="pc-foot__cols">
           <div>
@@ -24,9 +24,9 @@ export function Footer() {
           <div>
             <div className="pc-foot__h">{t.contact}</div>
             <address>
-              {t.address.split('\n').map((l, i) => <div key={i}>{l}</div>)}
-              <div style={{ marginTop: 8 }}>{t.email}</div>
-              <div>{t.phone}</div>
+              {t.address && t.address.split('\n').map((l, i) => <div key={i}>{l}</div>)}
+              {t.email && <div style={{ marginTop: t.address ? 8 : 0 }}>{t.email}</div>}
+              {t.phone && <div>{t.phone}</div>}
             </address>
           </div>
         </div>

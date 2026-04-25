@@ -83,7 +83,6 @@ export function ProductPage({ productId }: ProductPageProps) {
             <p className="pc-info__desc">{p.desc[s.lang]}</p>
 
             <dl className="pc-facts">
-              <div className="pc-facts__row"><dt>{t.foundLabel}</dt><dd>{p.foundAt[s.lang]}</dd></div>
               <div className="pc-facts__row"><dt>{t.makerLabel}</dt><dd>{p.maker[s.lang]}</dd></div>
               <div className="pc-facts__row"><dt>{t.eraLabel}</dt><dd>{p.era[s.lang]}</dd></div>
               <div className="pc-facts__row"><dt>{t.conditionLabel}</dt><dd>{p.condition[s.lang]}</dd></div>
@@ -107,7 +106,7 @@ export function ProductPage({ productId }: ProductPageProps) {
               items={[
                 { id: 'desc', title: t.descTitle, body: <p>{p.desc[s.lang]}</p> },
                 { id: 'prov', title: t.provTitle, body: (
-                  <><p>{p.foundAt[s.lang]} — {p.era[s.lang]}.</p><p>{p.condition[s.lang]}</p></>
+                  <><p>{p.era[s.lang]} · {p.maker[s.lang]}</p><p>{p.condition[s.lang]}</p></>
                 )},
                 { id: 'dim',  title: t.dimTitle,  body: <p>{p.dimensions[s.lang]}</p> },
                 { id: 'care', title: t.careTitle, body: <p>{p.care[s.lang]}</p> },
